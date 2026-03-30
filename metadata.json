@@ -1,0 +1,5 @@
+{
+  "name": "TP8 Monitoring Spring Boot",
+  "description": "Solution complète pour la supervision, le logging et le monitoring avec Actuator, Prometheus et Grafana.",
+  "requestFramePermissions": []
+}
