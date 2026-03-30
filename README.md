@@ -1,34 +1,46 @@
-# Rapport de TP8 : Supervision et Monitoring Spring Boot
+# Projet de Supervision et Monitoring - TP8
 
-## Introduction
-Ce projet implémente une solution complète de monitoring pour une application Spring Boot. L'objectif est de transformer une application "boîte noire" en un système observable en utilisant les standards de l'industrie : Spring Boot Actuator, Prometheus et Grafana.
+## 1. Présentation du Projet
+Ce dépôt contient la solution technique pour le TP8 portant sur l'observabilité des applications Spring Boot. L'enjeu majeur est de transformer une application Java classique en un système monitoré, capable de fournir des indicateurs de performance en temps réel pour des environnements de production DevOps.
 
-## Résultats et Analyse
+## 2. Architecture Technique
+La solution repose sur une pile logicielle moderne :
+- **Spring Boot 3.2.4** : Framework applicatif.
+- **Spring Boot Actuator** : Exposition des métriques internes.
+- **Micrometer & Prometheus Registry** : Formatage des données pour le collecteur.
+- **Prometheus** : Base de données de séries temporelles pour la collecte.
+- **Grafana** : Interface de visualisation et de dashboarding.
+- **Docker Compose** : Orchestration des services de monitoring.
 
-### 1. Spring Boot Actuator
-L'activation de l'Actuator permet d'exposer des points de terminaison critiques :
-- `/actuator/health` : Confirme que l'application est opérationnelle (`UP`).
-- `/actuator/info` : Affiche les métadonnées de l'application.
-- `/actuator/metrics` : Fournit des détails techniques sur la JVM (mémoire, CPU, threads).
+## 3. Détails de l'Implémentation
 
-### 2. Journalisation (Logging)
-La configuration personnalisée dans `application.properties` permet :
-- Une sortie structurée dans la console pour le développement.
-- La persistance des logs dans `logs/system.log` pour l'analyse post-mortem.
-- Un niveau de log `DEBUG` pour le package `ma.ens.tp8monitoring`, facilitant le traçage des requêtes.
+### Supervision Applicative (Actuator)
+L'application expose ses points de contrôle via `/actuator`. Nous avons configuré une exposition totale (`*`) pour permettre une analyse fine de la santé du système (`/health`), des informations de build (`/info`) et des métriques JVM (`/metrics`).
 
-### 3. Intégration Prometheus
-Grâce à Micrometer, les métriques sont converties au format Prometheus. L'endpoint `/actuator/prometheus` expose des compteurs tels que `app.execution.total` (métrique personnalisée) et `http_server_requests_seconds_count`.
+### Stratégie de Journalisation (Logging)
+Le système de log a été structuré pour répondre aux besoins de production :
+- **Rotation et Persistance** : Les logs sont écrits dans `logs/system.log`.
+- **Formatage** : Utilisation d'un pattern précis incluant le timestamp, le thread et le niveau de sévérité.
+- **Niveaux de Log** : Passage en `DEBUG` pour le code métier afin de tracer précisément le cycle de vie des requêtes.
 
-### 4. Visualisation Grafana
-L'utilisation du tableau de bord ID `4701` permet de visualiser en temps réel :
-- Le débit des requêtes HTTP.
-- La latence moyenne des traitements (simulée à 500ms dans notre service).
-- L'état de santé de la mémoire Heap.
+### Collecte et Visualisation
+- **Prometheus** : Configuré pour "scraper" l'application toutes les 5 secondes.
+- **Grafana** : Utilise le dashboard standard `4701` pour afficher l'utilisation CPU, la latence HTTP et l'état de la mémoire Heap.
+
+## 4. Analyse des Résultats du TP
+L'exécution des tests a permis de valider les points suivants :
+- **Observabilité Réelle** : Les temps de réponse simulés (500ms) sont correctement capturés et moyennés dans Grafana.
+- **Traçabilité** : Chaque appel à l'endpoint `/execute-task` génère une entrée de log explicite et incrémente un compteur personnalisé (`app.execution.total`) visible dans Prometheus.
+- **Réactivité** : L'état `UP` de l'application est immédiatement détectable, permettant une intégration facile avec des systèmes d'alerte.
+
+## 5. Bonnes Pratiques Appliquées
+- **Séparation des préoccupations** : Logique métier isolée dans des services.
+- **Métriques Métier** : Ajout de compteurs spécifiques au domaine plutôt que de se limiter aux métriques techniques.
+- **Conteneurisation** : Utilisation de Docker pour garantir la reproductibilité de l'environnement de monitoring.
 
 ## Conclusion
-La mise en place de cette chaîne d'observabilité permet une gestion proactive des incidents. L'application n'est plus seulement un exécutable, mais un système dont on peut mesurer la performance et la fiabilité de manière continue.
+Ce TP démontre qu'une application moderne ne se limite pas à ses fonctionnalités métier. L'ajout d'une couche d'observabilité robuste est indispensable pour garantir la résilience et la maintenabilité des systèmes distribués.
 
 ---
-**Groupe :** ma.ens
-**Artifact :** tp8-monitoring
+**GroupId :** ma.ens
+**ArtifactId :** tp8-monitoring
